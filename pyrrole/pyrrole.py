@@ -22,3 +22,31 @@
 
 """Core module of pyrrole."""
 
+
+class Role(type):
+    """Metaclass of role type"""
+
+    def __new__(cls, name, bases, dct):
+        # Create a new instance role class
+        role = super().__new__(cls, name, bases, dct)
+        return role
+
+    def __call__(self, cls):
+        # Add role
+        if hasattr(cls, '__roles__'):
+            cls.__roles__.append(self.__name__)
+        else:
+            setattr(cls, '__roles__', [self.__name__])
+        # Inject other attribute or method on role class
+        for attr in dir(self):
+            if self.__hasrolemethod__(attr):
+                setattr(cls, attr, getattr(self, attr))
+        return cls
+
+    def __hasrolemethod__(self, method):
+        # Check if is role metodh
+        _method = getattr(self, method)
+        if hasattr(_method, '__isrolemethod__'):
+            return True
+        else:
+            return False
