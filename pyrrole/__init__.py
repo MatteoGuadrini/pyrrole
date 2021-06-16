@@ -21,3 +21,5 @@
 #     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 """Python library for create role."""
+
+from .pyrrole import Role, role, role_method, has_role, apply_roles
