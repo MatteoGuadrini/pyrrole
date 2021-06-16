@@ -26,27 +26,33 @@
 class Role(type):
     """Metaclass of role type"""
 
-    def __new__(cls, name, bases, dct):
+    def __new__(mcs, name, bases, dct):
         # Create a new instance role class
-        role = super().__new__(cls, name, bases, dct)
+        role = super().__new__(mcs, name, bases, dct)
         return role
 
-    def __call__(self, cls):
+    def __call__(cls, instance):
         # Add role
-        if hasattr(cls, '__roles__'):
-            cls.__roles__.append(self.__name__)
+        if hasattr(instance, '__roles__'):
+            instance.__roles__.append(cls.__name__)
         else:
-            setattr(cls, '__roles__', [self.__name__])
+            setattr(instance, '__roles__', [cls.__name__])
         # Inject other attribute or method on role class
-        for attr in dir(self):
-            if self.__hasrolemethod__(attr):
-                setattr(cls, attr, getattr(self, attr))
-        return cls
+        for attr in dir(cls):
+            if cls.__hasrolemethod__(attr):
+                setattr(instance, attr, getattr(cls, attr))
+        return instance
 
     def __hasrolemethod__(self, method):
-        # Check if is role metodh
+        # Check if is role method
         _method = getattr(self, method)
         if hasattr(_method, '__isrolemethod__'):
             return True
         else:
             return False
+
+
+def role_method(objfunc):
+    """Decorator method for role method"""
+    setattr(objfunc, '__isrolemethod__', True)
+    return objfunc
