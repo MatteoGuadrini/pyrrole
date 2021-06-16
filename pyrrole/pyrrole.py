@@ -71,3 +71,12 @@ def has_role(instance, role_name):
 def role(cls):
     """Decorator function for create role type"""
     return Role(cls.__name__, (), dict(cls.__dict__))
+
+
+def apply_roles(*role_objects):
+    """Decorator function for more roles"""
+    def role_class(cls):
+        for roleobj in role_objects:
+            cls = roleobj(cls)
+        return cls
+    return role_class
