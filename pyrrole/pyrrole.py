@@ -28,8 +28,8 @@ class Role(type):
 
     def __new__(mcs, name, bases, dct):
         # Create a new instance role class
-        role = super().__new__(mcs, name, bases, dct)
-        return role
+        new_class = super().__new__(mcs, name, bases, dct)
+        return new_class
 
     def __call__(cls, instance):
         # Add role
@@ -58,11 +58,16 @@ def role_method(objfunc):
     return objfunc
 
 
-def has_role(instance, role):
+def has_role(instance, role_name):
     """Class has a role?"""
     if not hasattr(instance, '__roles__'):
         return False
-    if role.__name__ in instance.__roles__:
+    if role_name.__name__ in instance.__roles__:
         return True
     else:
         return False
+
+
+def role(cls):
+    """Decorator function for create role type"""
+    return Role(cls.__name__, (), dict(cls.__dict__))
