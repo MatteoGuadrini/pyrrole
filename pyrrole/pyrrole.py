@@ -56,3 +56,13 @@ def role_method(objfunc):
     """Decorator method for role method"""
     setattr(objfunc, '__isrolemethod__', True)
     return objfunc
+
+
+def has_role(instance, role):
+    """Class has a role?"""
+    if not hasattr(instance, '__roles__'):
+        return False
+    if role.__name__ in instance.__roles__:
+        return True
+    else:
+        return False
