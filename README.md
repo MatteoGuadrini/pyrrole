@@ -53,6 +53,52 @@ apple = Apple()
 print(apple.fall('apple tree'))
 ```
 
+## More roles
+
+An ordinary class can have multiple roles at the same time.
+
+```python
+import pyrrole
+
+@pyrrole.role                   # use role with decorator
+class FallFromTree:
+    
+    def __init__(self, cls):
+        self.trees = list()
+        self.trees.append(cls)
+    
+    def fall(self, tree='tree'):
+        return f"Fall from {tree}"
+    
+@pyrrole.role                   # use role with decorator
+class Deciduous:
+    
+    def __init__(self, cls):
+        self.trees = list()
+        self.trees.append(cls)
+    
+    @pyrrole.role_method
+    def clean_leaf(self):
+        return f"Clean all leaf"
+
+class Fruit:
+    pass
+
+@pyrrole.apply_roles(FallFromTree, Deciduous)
+class Apple(Fruit):
+    pass
+
+apple = Apple()
+
+# apple has role?
+pyrrole.has_role(apple, FallFromTree)   # True
+pyrrole.has_role(apple, Deciduous)      # True
+
+print(apple.__roles__)                  # ['FallFromTree', 'Deciduous']
+print(apple.clean_leaf())               # method inherited from the role
+print(FallFromTree.fall('apple tree'))  # role method
+```
+
 ## Open source
 _pyrrole_ is an open source project. Any contribute, It's welcome.
 
