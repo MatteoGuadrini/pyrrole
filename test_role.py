@@ -53,6 +53,10 @@ class TestExecutor(unittest.TestCase):
         @pyrrole.role
         class FallFromTree:
 
+            def __init__(self, cls):
+                self.fruits = list()
+                self.fruits.append(cls)
+
             def fall(self, tree='tree'):
                 print(f'Fall from {tree}')
 
@@ -76,6 +80,10 @@ class TestExecutor(unittest.TestCase):
     def test_role_method_decorator(self):
         @pyrrole.role
         class FallFromTree:
+
+            def __init__(self, cls):
+                self.fruits = list()
+                self.fruits.append(cls)
 
             def fall(self, tree='tree'):
                 print(f'Fall from {tree}')
