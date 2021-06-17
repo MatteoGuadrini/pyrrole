@@ -39,11 +39,11 @@ class Role(type):
             setattr(instance, '__roles__', [cls.__name__])
         # Inject other attribute or method on role class
         for attr in dir(cls):
-            if cls.__hasrolemethod__(attr):
+            if cls._isrolemethod(attr):
                 setattr(instance, attr, getattr(cls, attr))
         return instance
 
-    def __hasrolemethod__(self, method):
+    def _isrolemethod(self, method):
         # Check if is role method
         _method = getattr(self, method)
         if hasattr(_method, '__isrolemethod__'):
