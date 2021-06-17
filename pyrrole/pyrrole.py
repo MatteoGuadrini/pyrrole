@@ -39,14 +39,16 @@ class Role(type):
             setattr(instance, '__roles__', [cls.__name__])
         # Inject other attribute or method on role class
         for attr in dir(cls):
-            if cls.__hasrolemethod__(attr):
-                setattr(instance, attr, getattr(cls, attr))
+            if cls._isrolemethod(attr) or not callable(getattr(cls, attr)):
+                # Resolve method name conflict: https://www.python.org/download/releases/2.3/mro/
+                if not hasattr(instance, attr):
+                    setattr(instance, attr, getattr(cls, attr))
         return instance
 
-    def __hasrolemethod__(self, method):
+    def _isrolemethod(self, method):
         # Check if is role method
         _method = getattr(self, method)
-        if hasattr(_method, '__isrolemethod__'):
+        if hasattr(_method, '__isrolemethod__') and callable(_method):
             return True
         else:
             return False
@@ -54,8 +56,11 @@ class Role(type):
 
 def role_method(objfunc):
     """Decorator method for role method"""
-    setattr(objfunc, '__isrolemethod__', True)
-    return objfunc
+    if callable(objfunc):
+        setattr(objfunc, '__isrolemethod__', True)
+        return objfunc
+    else:
+        raise AttributeError(f'{objfunc} is not a function or method')
 
 
 def has_role(instance, role_name):
