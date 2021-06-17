@@ -7,6 +7,8 @@ class TestExecutor(unittest.TestCase):
     def test_role_class(self):
         class FallFromTree(metaclass=pyrrole.Role):
 
+            a = 1
+
             @pyrrole.role_method
             def fall(self, tree='tree'):
                 print(f'Fall from {tree}')
@@ -22,6 +24,7 @@ class TestExecutor(unittest.TestCase):
 
         self.assertIsInstance(apple, Fruit)
         self.assertIn('FallFromTree', apple.__roles__)
+        self.assertEqual(apple.a, 1)
         apple.fall()
         apple.fall('apple tree')
 
