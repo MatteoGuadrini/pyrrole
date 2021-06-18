@@ -29,8 +29,8 @@ In this example, the `Apple` class inherits from `Fruit` but not `FallFromTree`.
 
 ## Role method
 
-By default, no method or attribute is inherited from a role class. 
-If you want a method to be inherited, just enclose the method to inherit in a _role_method_ decorator.
+By default, all methods or attribute is inherited from a role class except the dunder methods (ex. `__str__`).. 
+To force the import of a dunder or normal method, just enclose the method to inherit in a _role_method_ decorator.
 
 ```python
 import pyrrole
@@ -38,8 +38,8 @@ import pyrrole
 class FallFromTree(metaclass=pyrrole.Role):
     
     @pyrrole.role_method
-    def fall(self, tree='tree'):
-        return f"Fall from {tree}"
+    def __str__(self):
+        return f"Fall from tree"
 
 class Fruit:
     pass
@@ -50,7 +50,7 @@ class Apple(Fruit):
 
 apple = Apple()
 
-print(apple.fall('apple tree'))
+print(apple)
 ```
 
 ## More roles
@@ -96,7 +96,7 @@ pyrrole.has_role(apple, Deciduous)      # True
 
 print(apple.__roles__)                  # ['FallFromTree', 'Deciduous']
 print(apple.clean_leaf())               # method inherited from the role
-print(FallFromTree.fall('apple tree'))  # role method
+print(apple.fall('apple tree'))         # method forced inherited from the role
 ```
 
 ## Open source

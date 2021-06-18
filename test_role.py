@@ -9,7 +9,6 @@ class TestExecutor(unittest.TestCase):
 
             a = 1
 
-            @pyrrole.role_method
             def fall(self, tree='tree'):
                 print(f'Fall from {tree}')
 

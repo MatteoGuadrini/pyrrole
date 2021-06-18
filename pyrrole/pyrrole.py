@@ -39,10 +39,8 @@ class Role(type):
             setattr(instance, '__roles__', [cls.__name__])
         # Inject other attribute or method on role class
         for attr in dir(cls):
-            if cls._isrolemethod(attr) or not callable(getattr(cls, attr)):
-                # Resolve method name conflict: https://www.python.org/download/releases/2.3/mro/
-                if not hasattr(instance, attr):
-                    setattr(instance, attr, getattr(cls, attr))
+            if cls._isrolemethod(attr) or not attr.startswith('_'):
+                setattr(instance, attr, getattr(cls, attr))
         return instance
 
     def _isrolemethod(self, method):
