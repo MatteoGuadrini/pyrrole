@@ -22,6 +22,8 @@
 
 """Core module of pyrrole."""
 
+from .exception import RoleMethodError
+
 
 class Role(type):
     """Metaclass of role type"""
@@ -58,7 +60,7 @@ def role_method(objfunc):
         setattr(objfunc, '__isrolemethod__', True)
         return objfunc
     else:
-        raise AttributeError(f'{objfunc} is not a function or method')
+        raise RoleMethodError(f'{objfunc} is not a function or method')
 
 
 def has_role(instance, role_name):
@@ -78,8 +80,10 @@ def role(cls):
 
 def apply_roles(*role_objects):
     """Decorator function for more roles"""
+
     def role_class(cls):
         for roleobj in role_objects:
             cls = roleobj(cls)
         return cls
+
     return role_class
