@@ -29,3 +29,7 @@ class RoleError(Exception):
 
 class RoleMethodError(RoleError):
     pass
+
+
+class RoleAttributeNameError(RoleError):
+    pass
