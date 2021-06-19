@@ -105,6 +105,32 @@ class TestExecutor(unittest.TestCase):
 
         print(apple)
 
+    def test_role_name_conflict(self):
+        class FallFromTree(metaclass=pyrrole.Role):
+
+            def fall(self, tree='tree'):
+                print(f'Fall from {tree}')
+
+        class Deciduous(metaclass=pyrrole.Role):
+
+            # Name conflict: force replace method with role_method decorator
+            @pyrrole.role_method
+            def fall(self):
+                print(f'Leaf fall')
+
+        class Fruit:
+            pass
+
+        @pyrrole.apply_roles(FallFromTree, Deciduous)
+        class Apple(Fruit):
+            pass
+
+        apple = Apple()
+
+        self.assertIsInstance(apple, Fruit)
+        self.assertTrue(pyrrole.has_role(apple, FallFromTree))
+        self.assertTrue(pyrrole.has_role(apple, Deciduous))
+
 
 if __name__ == '__main__':
     unittest.main()
