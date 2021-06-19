@@ -22,7 +22,7 @@
 
 """Core module of pyrrole."""
 
-from .exception import RoleMethodError
+from .exception import RoleMethodError, RoleAttributeNameError
 
 
 class Role(type):
@@ -41,8 +41,15 @@ class Role(type):
             setattr(instance, '__roles__', [cls.__name__])
         # Inject other attribute or method on role class
         for attr in dir(cls):
-            if cls._isrolemethod(attr) or not attr.startswith('_'):
+            # Role method: if specified force replace with name conflict
+            if cls._isrolemethod(attr):
                 setattr(instance, attr, getattr(cls, attr))
+                continue
+            # Method name conflict
+            if not hasattr(instance, attr) and not attr.startswith('_'):
+                setattr(instance, attr, getattr(cls, attr))
+            elif not attr.startswith('_'):
+                raise RoleAttributeNameError(f'Attribute or method name conflict: {attr}')
         return instance
 
     def _isrolemethod(self, method):
@@ -85,5 +92,4 @@ def apply_roles(*role_objects):
         for roleobj in role_objects:
             cls = roleobj(cls)
         return cls
-
     return role_class
