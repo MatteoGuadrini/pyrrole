@@ -22,6 +22,8 @@
 
 """Core module of pyrrole."""
 
+from .exception import RoleMethodError, RoleAttributeNameError
+
 
 class Role(type):
     """Metaclass of role type"""
@@ -39,10 +41,15 @@ class Role(type):
             setattr(instance, '__roles__', [cls.__name__])
         # Inject other attribute or method on role class
         for attr in dir(cls):
-            if cls._isrolemethod(attr) or not callable(getattr(cls, attr)):
-                # Resolve method name conflict: https://www.python.org/download/releases/2.3/mro/
-                if not hasattr(instance, attr):
-                    setattr(instance, attr, getattr(cls, attr))
+            # Role method: if specified force replace with name conflict
+            if cls._isrolemethod(attr):
+                setattr(instance, attr, getattr(cls, attr))
+                continue
+            # Method name conflict
+            if not hasattr(instance, attr) and not attr.startswith('_'):
+                setattr(instance, attr, getattr(cls, attr))
+            elif not attr.startswith('_'):
+                raise RoleAttributeNameError(f'Attribute or method name conflict: {attr}')
         return instance
 
     def _isrolemethod(self, method):
@@ -60,7 +67,7 @@ def role_method(objfunc):
         setattr(objfunc, '__isrolemethod__', True)
         return objfunc
     else:
-        raise AttributeError(f'{objfunc} is not a function or method')
+        raise RoleMethodError(f'{objfunc} is not a function or method')
 
 
 def has_role(instance, role_name):
@@ -80,6 +87,7 @@ def role(cls):
 
 def apply_roles(*role_objects):
     """Decorator function for more roles"""
+
     def role_class(cls):
         for roleobj in role_objects:
             cls = roleobj(cls)
