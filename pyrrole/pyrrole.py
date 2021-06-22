@@ -27,10 +27,10 @@ from .exception import RoleMethodError, RoleAttributeNameError
 
 class Role(type):
     """Metaclass of role type"""
-
-    def __new__(mcs, name, bases, dct):
+    def __new__(mcs, name, bases, dct, **methods):
         # Create a new instance role class
         new_class = super().__new__(mcs, name, bases, dct)
+        new_class.role_methods = methods
         return new_class
 
     def __call__(cls, instance):
@@ -41,14 +41,22 @@ class Role(type):
             setattr(instance, '__roles__', [cls.__name__])
         # Inject other attribute or method on role class
         for attr in dir(cls):
-            # Role method: if specified force replace with name conflict
+            # Check role_methods if is already specified
+            if attr == 'role_methods':
+                if hasattr(instance, attr):
+                    cls.role_methods.update(getattr(instance, attr))
+            # Role method decorator
             if cls._isrolemethod(attr):
                 setattr(instance, attr, getattr(cls, attr))
                 continue
             # Method name conflict
             if not hasattr(instance, attr) and not attr.startswith('_'):
                 setattr(instance, attr, getattr(cls, attr))
-            elif not attr.startswith('_'):
+            elif hasattr(instance, attr) and attr in cls.role_methods:
+                if not callable(getattr(instance, attr)):
+                    raise RoleMethodError(f'{attr} is not a method')
+                setattr(instance, cls.role_methods.get(attr), getattr(instance, attr))
+            elif not attr.startswith('_') and not attr == 'role_methods':
                 raise RoleAttributeNameError(f'Attribute or method name conflict: {attr}')
         return instance
 
@@ -82,14 +90,13 @@ def has_role(instance, role_name):
 
 def role(cls):
     """Decorator function for create role type"""
-    return Role(cls.__name__, (), dict(cls.__dict__))
+    return Role(cls.__name__, cls.__bases__, dict(cls.__dict__))
 
 
 def apply_roles(*role_objects):
-    """Decorator function for more roles"""
-
-    def role_class(cls):
-        for roleobj in role_objects:
-            cls = roleobj(cls)
+    """Decorator function to apply two or more roles"""
+    def wrapped_class(cls):
+        for role_obj in role_objects:
+            cls = role_obj(cls)
         return cls
-    return role_class
+    return wrapped_class

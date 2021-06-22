@@ -38,7 +38,7 @@ import pyrrole
 class FallFromTree(metaclass=pyrrole.Role):
     
     @pyrrole.role_method
-    def __str__(self):
+    def __str__(cls):
         return f"Fall from tree"
 
 class Fruit:
@@ -63,22 +63,22 @@ import pyrrole
 @pyrrole.role                   # use role with decorator
 class FallFromTree:
     
-    def __init__(self, cls):
-        self.trees = list()
-        self.trees.append(cls)
+    def __init__(cls, cls):
+        cls.trees = list()
+        cls.trees.append(cls)
     
-    def fall(self, tree='tree'):
+    def fall(cls, tree='tree'):
         return f"Fall from {tree}"
     
 @pyrrole.role                   # use role with decorator
 class Deciduous:
     
-    def __init__(self, cls):
-        self.trees = list()
-        self.trees.append(cls)
+    def __init__(cls, cls):
+        cls.trees = list()
+        cls.trees.append(cls)
     
     @pyrrole.role_method
-    def clean_leaf(self):
+    def clean_leaf(cls):
         return f"Clean all leaf"
 
 class Fruit:
