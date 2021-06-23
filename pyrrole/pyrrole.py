@@ -91,9 +91,11 @@ def has_role(instance, role_name):
         return False
 
 
-def role(cls):
+def role(**methods):
     """Decorator function for create role type"""
-    return Role(cls.__name__, cls.__bases__, dict(cls.__dict__))
+    def wrapper(cls):
+        return Role(cls.__name__, cls.__bases__, dict(cls.__dict__), **methods)
+    return wrapper
 
 
 def apply_roles(*role_objects):
