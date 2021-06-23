@@ -52,7 +52,7 @@ class TestRole(unittest.TestCase):
         self.assertTrue(pyrrole.has_role(apple, Deciduous))
 
     def test_role_decorator(self):
-        @pyrrole.role
+        @pyrrole.role()
         class FallFromTree:
 
             def __init__(self, cls):
@@ -79,7 +79,7 @@ class TestRole(unittest.TestCase):
         self.assertTrue(pyrrole.pyrrole.has_role(apple, FallFromTree))
 
     def test_role_method_decorator(self):
-        @pyrrole.role
+        @pyrrole.role()
         class FallFromTree:
 
             def __init__(self, cls):
@@ -124,6 +124,30 @@ class TestRole(unittest.TestCase):
 
         self.assertIsInstance(apple, Fruit)
         self.assertTrue(pyrrole.has_role(apple, FallFromTree))
+
+        @pyrrole.role(fall='fall_pear')
+        class Deciduous:
+            def __init__(self, cls):
+                self.fruits = list()
+                self.fruits.append(cls)
+
+            def fall(self, tree='tree'):
+                print(f'Fall from {tree}')
+
+        class Fruit:
+            pass
+
+        @Deciduous
+        class Pear(Fruit):
+            def fall(self):
+                print('Pear fell')
+
+        pear = Pear()
+
+        pear.fall_pear()
+
+        self.assertIsInstance(pear, Fruit)
+        self.assertTrue(pyrrole.has_role(pear, Deciduous))
 
 
 if __name__ == '__main__':
