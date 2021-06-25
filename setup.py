@@ -21,7 +21,7 @@ setup(
         ],
     long_description=long_description,
     long_description_content_type="text/markdown",
-    description='',
+    description='Role system for Python3',
     keywords='pyrrole role roles moose perl',
     python_requires='>=3.6'
 

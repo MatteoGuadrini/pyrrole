@@ -4,6 +4,23 @@ _pyrrole_ is a Role System for Python3 (3.6 and high).
 It's inspired by the roles implementation in the [Moose library of Perl](https://metacpan.org/pod/Moose::Role), 
 and its main purpose is to use instead of Mixin classes and multiple inheritance.
 
+## Test
+
+If you would test before install, follow these instructions:
+```console
+$ git clone https://github.com/MatteoGuadrini/pyrrole.git
+$ cd pyrrole
+$ python -m unittest test_role.py
+```
+
+## Install
+
+For install this package, run pip install:
+```console
+$ pip install --user pyrrole
+```
+
+
 ## Simple role
 
 Here is an example of how a role can be done:
