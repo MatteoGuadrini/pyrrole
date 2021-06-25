@@ -24,6 +24,8 @@
 
 from .exception import RoleMethodError, RoleAttributeNameError
 
+__all__ = ['Role', 'role', 'role_method', 'has_role', 'apply_roles']
+
 
 class Role(type):
     """Metaclass of role type"""
