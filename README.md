@@ -1,6 +1,25 @@
 # pyrrole
 
-_pyrrole_ is a python library that allows the use of class as a role rather than having N mixin classes that exploit the magic of MRO.
+_pyrrole_ is a Role System for Python3 (3.6 and high). 
+It's inspired by the roles implementation in the [Moose library of Perl](https://metacpan.org/pod/Moose::Role), 
+and its main purpose is to use instead of Mixin classes and multiple inheritance.
+
+## Test
+
+If you would test before install, follow these instructions:
+```console
+$ git clone https://github.com/MatteoGuadrini/pyrrole.git
+$ cd pyrrole
+$ python -m unittest test_role.py
+```
+
+## Install
+
+For install this package, run pip install:
+```console
+$ pip install --user pyrrole
+```
+
 
 ## Simple role
 
@@ -38,7 +57,7 @@ import pyrrole
 class FallFromTree(metaclass=pyrrole.Role):
     
     @pyrrole.role_method
-    def __str__(self):
+    def __str__(cls):
         return f"Fall from tree"
 
 class Fruit:
@@ -60,25 +79,24 @@ An ordinary class can have multiple roles at the same time.
 ```python
 import pyrrole
 
-@pyrrole.role                   # use role with decorator
+@pyrrole.role()                                 # use role with decorator
 class FallFromTree:
     
-    def __init__(self, cls):
-        self.trees = list()
-        self.trees.append(cls)
+    def __init__(cls, instance):
+        cls.trees = list()
+        cls.trees.append(instance)
     
-    def fall(self, tree='tree'):
+    def fall(cls, tree='tree'):
         return f"Fall from {tree}"
     
-@pyrrole.role                   # use role with decorator
+@pyrrole.role(clean_leaf='clean_apple_leaf')    # use role with decorator, with renamed method on the class when applied role
 class Deciduous:
     
-    def __init__(self, cls):
-        self.trees = list()
-        self.trees.append(cls)
+    def __init__(cls, instance):
+        cls.trees = list()
+        cls.trees.append(instance)
     
-    @pyrrole.role_method
-    def clean_leaf(self):
+    def clean_leaf(cls):
         return f"Clean all leaf"
 
 class Fruit:
@@ -86,7 +104,8 @@ class Fruit:
 
 @pyrrole.apply_roles(FallFromTree, Deciduous)
 class Apple(Fruit):
-    pass
+    def clean_leaf(self):
+        return f"Clean all leaf of apple tree"
 
 apple = Apple()
 
@@ -95,7 +114,7 @@ pyrrole.has_role(apple, FallFromTree)   # True
 pyrrole.has_role(apple, Deciduous)      # True
 
 print(apple.__roles__)                  # ['FallFromTree', 'Deciduous']
-print(apple.clean_leaf())               # method inherited from the role
+print(apple.clean_apple_leaf())         # method renamed from the role
 print(apple.fall('apple tree'))         # method forced inherited from the role
 ```
 

@@ -2,7 +2,7 @@ import unittest
 import pyrrole
 
 
-class TestExecutor(unittest.TestCase):
+class TestRole(unittest.TestCase):
 
     def test_role_class(self):
         class FallFromTree(metaclass=pyrrole.Role):
@@ -52,7 +52,7 @@ class TestExecutor(unittest.TestCase):
         self.assertTrue(pyrrole.has_role(apple, Deciduous))
 
     def test_role_decorator(self):
-        @pyrrole.role
+        @pyrrole.role()
         class FallFromTree:
 
             def __init__(self, cls):
@@ -76,11 +76,10 @@ class TestExecutor(unittest.TestCase):
         self.assertIsInstance(FallFromTree, pyrrole.pyrrole.Role)
         self.assertIsInstance(apple, Fruit)
         self.assertIn('FallFromTree', apple.__roles__)
-
         self.assertTrue(pyrrole.pyrrole.has_role(apple, FallFromTree))
 
     def test_role_method_decorator(self):
-        @pyrrole.role
+        @pyrrole.role()
         class FallFromTree:
 
             def __init__(self, cls):
@@ -106,30 +105,49 @@ class TestExecutor(unittest.TestCase):
         print(apple)
 
     def test_role_name_conflict(self):
-        class FallFromTree(metaclass=pyrrole.Role):
+        class FallFromTree(metaclass=pyrrole.Role, fall='fall_apple'):
 
             def fall(self, tree='tree'):
                 print(f'Fall from {tree}')
 
-        class Deciduous(metaclass=pyrrole.Role):
+        class Fruit:
+            pass
 
-            # Name conflict: force replace method with role_method decorator
-            @pyrrole.role_method
+        @FallFromTree
+        class Apple(Fruit):
             def fall(self):
-                print(f'Leaf fall')
+                print('Apple fell')
+
+        apple = Apple()
+
+        apple.fall_apple()
+
+        self.assertIsInstance(apple, Fruit)
+        self.assertTrue(pyrrole.has_role(apple, FallFromTree))
+
+        @pyrrole.role(fall='fall_pear')
+        class Deciduous:
+            def __init__(self, cls):
+                self.fruits = list()
+                self.fruits.append(cls)
+
+            def fall(self, tree='tree'):
+                print(f'Fall from {tree}')
 
         class Fruit:
             pass
 
-        @pyrrole.apply_roles(FallFromTree, Deciduous)
-        class Apple(Fruit):
-            pass
+        @Deciduous
+        class Pear(Fruit):
+            def fall(self):
+                print('Pear fell')
 
-        apple = Apple()
+        pear = Pear()
 
-        self.assertIsInstance(apple, Fruit)
-        self.assertTrue(pyrrole.has_role(apple, FallFromTree))
-        self.assertTrue(pyrrole.has_role(apple, Deciduous))
+        pear.fall_pear()
+
+        self.assertIsInstance(pear, Fruit)
+        self.assertTrue(pyrrole.has_role(pear, Deciduous))
 
 
 if __name__ == '__main__':
