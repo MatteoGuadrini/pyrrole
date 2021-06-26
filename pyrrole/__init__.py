@@ -24,7 +24,7 @@
 
 from .pyrrole import Role, role, role_method, has_role, apply_roles
 
-__version__ = '1.0.0'
+__version__ = '0.0.5'
 __author__ = 'Matteo Guadrini, Giacomo Montagner'
 __email__ = 'matteo.guadrini@hotmail.it'
 __homepage__ = 'https://github.com/MatteoGuadrini/pyrrole'
