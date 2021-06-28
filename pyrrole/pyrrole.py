@@ -24,15 +24,14 @@
 
 from .exception import RoleMethodError, RoleAttributeNameError
 
-__all__ = ['Role', 'role', 'role_method', 'has_role', 'apply_roles']
+__all__ = ['Role', 'role', 'role_method', 'has_role', 'apply_roles', 'rename_role_methods']
 
 
 class Role(type):
     """Metaclass of role type"""
-    def __new__(mcs, name, bases, dct, **methods):
+    def __new__(mcs, name, bases, dct):
         # Create a new instance role class
         new_class = super().__new__(mcs, name, bases, dct)
-        new_class.role_methods = methods
         return new_class
 
     def __call__(cls, instance):
@@ -43,20 +42,10 @@ class Role(type):
             setattr(instance, '__roles__', [cls.__name__])
         # Inject other attribute or method on role class
         for attr in dir(cls):
-            # Check role_methods if is already specified
-            if attr == 'role_methods':
-                if hasattr(instance, attr):
-                    cls.role_methods.update(getattr(instance, attr))
             # Method name conflict:
             # If attribute isn't in the instance and don't private
             if not hasattr(instance, attr) and not attr.startswith('_'):
                 setattr(instance, attr, getattr(cls, attr))
-            # If attribute is in the instance and in role methods
-            elif hasattr(instance, attr) and attr in cls.role_methods:
-                # Check if attribute is callable
-                if not callable(getattr(instance, attr)):
-                    raise RoleMethodError(f'{attr} is not a method')
-                setattr(instance, cls.role_methods.get(attr), getattr(instance, attr))
             # If attribute isn't private and not role methods
             elif not attr.startswith('_') and not attr == 'role_methods':
                 raise RoleAttributeNameError(f'Attribute or method name conflict: {attr}')
@@ -93,11 +82,9 @@ def has_role(instance, role_name):
         return False
 
 
-def role(**methods):
+def role(cls):
     """Decorator function for create role type"""
-    def wrapper(cls):
-        return Role(cls.__name__, cls.__bases__, dict(cls.__dict__), **methods)
-    return wrapper
+    return Role(cls.__name__, cls.__bases__, dict(cls.__dict__))
 
 
 def apply_roles(*role_objects):
@@ -107,3 +94,15 @@ def apply_roles(*role_objects):
             cls = role_obj(cls)
         return cls
     return wrapped_class
+
+
+def rename_role_methods(**methods):
+    """Decorator function for rename methods on Role based class"""
+    def wrapped_role(cls):
+        # Check if method is into class
+        for name, new_name in methods.items():
+            if name in dir(cls):
+                setattr(cls, new_name, getattr(cls, name))
+                delattr(cls, name)
+        return cls
+    return wrapped_role

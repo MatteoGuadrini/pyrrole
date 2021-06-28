@@ -22,7 +22,7 @@
 
 """Python library for create role."""
 
-from .pyrrole import Role, role, role_method, has_role, apply_roles
+from .pyrrole import Role, role, role_method, has_role, apply_roles, rename_role_methods
 
 __version__ = '0.0.5'
 __author__ = 'Matteo Guadrini, Giacomo Montagner'
