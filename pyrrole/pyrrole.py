@@ -29,6 +29,7 @@ __all__ = ['Role', 'role', 'role_method', 'has_role', 'apply_roles', 'rename_rol
 
 class Role(type):
     """Metaclass of role type"""
+
     def __new__(mcs, name, bases, dct):
         # Create a new instance role class
         new_class = super().__new__(mcs, name, bases, dct)
@@ -47,7 +48,7 @@ class Role(type):
             if not hasattr(instance, attr) and not attr.startswith('_'):
                 setattr(instance, attr, getattr(cls, attr))
             # If attribute isn't private and not role methods
-            elif not attr.startswith('_') and not attr == 'role_methods':
+            elif not attr.startswith('_'):
                 raise RoleAttributeNameError(f'Attribute or method name conflict: {attr}')
             # Role method decorator
             if cls._isrolemethod(attr) and attr.startswith('_'):
@@ -89,15 +90,18 @@ def role(cls):
 
 def apply_roles(*role_objects):
     """Decorator function to apply two or more roles"""
+
     def wrapped_class(cls):
         for role_obj in role_objects:
             cls = role_obj(cls)
         return cls
+
     return wrapped_class
 
 
 def rename_role_methods(**methods):
     """Decorator function for rename methods on Role based class"""
+
     def wrapped_role(cls):
         # Check if method is into class
         for name, new_name in methods.items():
@@ -105,4 +109,5 @@ def rename_role_methods(**methods):
                 setattr(cls, new_name, getattr(cls, name))
                 delattr(cls, name)
         return cls
+
     return wrapped_role

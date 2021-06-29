@@ -6,7 +6,6 @@ class TestRole(unittest.TestCase):
 
     def test_role_class(self):
         class FallFromTree(metaclass=pyrrole.Role):
-
             a = 1
 
             def fall(self, tree='tree'):
@@ -139,6 +138,8 @@ class TestRole(unittest.TestCase):
             pass
 
         @Deciduous
+        @pyrrole.rename_role_methods(fall='fall_apple')
+        @FallFromTree
         @pyrrole.rename_role_methods(fall='fall_pear')
         class Pear(Fruit):
             def fall(self):
@@ -147,10 +148,12 @@ class TestRole(unittest.TestCase):
         pear = Pear()
 
         pear.fall_pear()
+        pear.fall_apple()
         pear.fall()
 
         self.assertIsInstance(pear, Fruit)
         self.assertTrue(pyrrole.has_role(pear, Deciduous))
+        self.assertTrue(pyrrole.has_role(pear, FallFromTree))
 
 
 if __name__ == '__main__':
