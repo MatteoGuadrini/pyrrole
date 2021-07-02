@@ -127,9 +127,6 @@ class TestRole(unittest.TestCase):
 
         @pyrrole.role
         class Deciduous:
-            def __init__(self, cls):
-                self.fruits = list()
-                self.fruits.append(cls)
 
             def fall(self, tree='tree'):
                 print(f'Fall from {tree}')

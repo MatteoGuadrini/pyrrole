@@ -35,33 +35,39 @@ class Role(type):
         new_class = super().__new__(mcs, name, bases, dct)
         return new_class
 
-    def __call__(cls, instance):
-        # Add role
-        if hasattr(instance, '__roles__'):
-            instance.__roles__.append(cls.__name__)
-        else:
-            setattr(instance, '__roles__', [cls.__name__])
-        # Inject other attribute or method on role class
-        for attr in dir(cls):
-            # Method name conflict:
-            # If attribute isn't in the instance and don't private
-            if not hasattr(instance, attr) and not attr.startswith('_'):
-                setattr(instance, attr, getattr(cls, attr))
-            # If attribute isn't private and not role methods
-            elif not attr.startswith('_'):
-                raise RoleAttributeNameError(f'Attribute or method name conflict: {attr}')
-            # Role method decorator
-            if cls._isrolemethod(attr) and attr.startswith('_'):
-                setattr(instance, attr, getattr(cls, attr))
-        return instance
+    def __call__(cls, *args):
+        return cls._install_methods(args[0])
 
-    def _isrolemethod(self, method):
+    def _isrolemethod(cls, method):
         # Check if is role method
-        _method = getattr(self, method)
+        _method = getattr(cls, method)
         if hasattr(_method, '__isrolemethod__') and callable(_method):
             return True
         else:
             return False
+
+    def _install_methods(cls, class_):
+        # Add role
+        if hasattr(class_, '__roles__'):
+            class_.__roles__.append(cls.__name__)
+        else:
+            setattr(class_, '__roles__', [cls.__name__])
+        # Inject other attribute or method on role class
+        for attr in dir(cls):
+            if attr == 'roled_class':
+                continue
+            # Role method decorator
+            if cls._isrolemethod(attr) and attr.startswith('_'):
+                setattr(class_, attr, getattr(cls, attr))
+                continue
+            # Method name conflict:
+            # If attribute isn't in the instance and don't private
+            if not hasattr(class_, attr) and not attr.startswith('_'):
+                setattr(class_, attr, getattr(cls, attr))
+            # If attribute isn't private and not role methods
+            elif not attr.startswith('_'):
+                raise RoleAttributeNameError(f'Attribute or method name conflict: {attr}')
+        return class_
 
 
 def role_method(objfunc):
