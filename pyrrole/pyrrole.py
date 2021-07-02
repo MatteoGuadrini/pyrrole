@@ -35,8 +35,8 @@ class Role(type):
         new_class = super().__new__(mcs, name, bases, dct)
         return new_class
 
-    def __call__(cls, *args):
-        return cls._install_methods(args[0])
+    def __call__(cls, class_):
+        return cls._install_methods(class_)
 
     def _isrolemethod(cls, method):
         # Check if is role method
