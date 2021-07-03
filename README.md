@@ -4,6 +4,8 @@ _pyrrole_ is a Role System for Python3 (3.6 and high).
 It's inspired by the roles implementation in the [Moose library of Perl](https://metacpan.org/pod/Moose::Role), 
 and its main purpose is to use instead of Mixin classes and multiple inheritance.
 
+> ATTENTION: This package is **WIP**
+
 ## Test
 
 If you would test before install, follow these instructions:
@@ -79,7 +81,7 @@ An ordinary class can have multiple roles at the same time.
 ```python
 import pyrrole
 
-@pyrrole.role()                                 # use role with decorator
+@pyrrole.role                                  # use role with decorator
 class FallFromTree:
     
     def __init__(cls, instance):
@@ -89,7 +91,7 @@ class FallFromTree:
     def fall(cls, tree='tree'):
         return f"Fall from {tree}"
     
-@pyrrole.role(clean_leaf='clean_apple_leaf')    # use role with decorator, with renamed method on the class when applied role
+@pyrrole.role                                   # use role with decorator
 class Deciduous:
     
     def __init__(cls, instance):
@@ -103,6 +105,7 @@ class Fruit:
     pass
 
 @pyrrole.apply_roles(FallFromTree, Deciduous)
+@pyrrole.rename_role_methods(clean_leaf='clean_apple_leaf') # renamed role names
 class Apple(Fruit):
     def clean_leaf(self):
         return f"Clean all leaf of apple tree"
