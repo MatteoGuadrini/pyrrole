@@ -128,6 +128,9 @@ class TestRole(unittest.TestCase):
         @pyrrole.role
         class Deciduous:
 
+            def __init__(self, cls):
+                self.tree = cls
+
             def fall(self, tree='tree'):
                 print(f'Fall from {tree}')
 

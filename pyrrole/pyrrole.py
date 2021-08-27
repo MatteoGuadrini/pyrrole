@@ -23,6 +23,7 @@
 """Core module of pyrrole."""
 
 from .exception import RoleMethodError, RoleAttributeNameError
+from types import new_class
 
 __all__ = ['Role', 'role', 'role_method', 'has_role', 'apply_roles', 'rename_role_methods']
 
@@ -32,8 +33,8 @@ class Role(type):
 
     def __new__(mcs, name, bases, dct):
         # Create a new instance role class
-        new_class = super().__new__(mcs, name, bases, dct)
-        return new_class
+        new_cls = super().__new__(mcs, name, bases, dct)
+        return new_cls
 
     def __call__(cls, class_):
         return cls._install_methods(class_)
@@ -91,7 +92,11 @@ def has_role(instance, role_name):
 
 def role(cls):
     """Decorator function for create role type"""
-    return Role(cls.__name__, cls.__bases__, dict(cls.__dict__))
+    new_cls = new_class(cls.__name__, cls.__bases__, {'metaclass': Role})
+    for key, value in dict(cls.__dict__).items():
+        if key != '__dict__':
+            setattr(new_cls, key, value)
+    return new_cls
 
 
 def apply_roles(*role_objects):
