@@ -39,6 +39,19 @@ class Role(type):
     def __call__(cls, class_):
         return cls._install_methods(class_)
 
+    def _make_role_property(cls):
+
+        def get_roles(self):
+            return self.__roles
+
+        def set_roles(self, value):
+            if not isinstance(value, list):
+                raise AttributeError('__roles__ must be a list')
+            self.__roles = value
+
+        cls.__roles = None
+        cls.__roles__ = property(fget=get_roles, fset=set_roles)
+
     def _isrolemethod(cls, method):
         # Check if is role method
         _method = getattr(cls, method)
@@ -52,7 +65,8 @@ class Role(type):
         if hasattr(class_, '__roles__'):
             class_.__roles__.append(cls.__name__)
         else:
-            setattr(class_, '__roles__', [cls.__name__])
+            cls._make_role_property()
+            class_.__roles__ = [cls.__name__]
         # Inject other attribute or method on role class
         for attr in dir(cls):
             if attr == 'roled_class':
