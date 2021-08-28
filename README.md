@@ -6,7 +6,7 @@ _pyrrole_ is a Role System for Python3 (3.6 and high).
 It's inspired by the roles implementation in the [Moose library of Perl](https://metacpan.org/pod/Moose::Role), 
 and its main purpose is to use instead of Mixin classes and multiple inheritance.
 
-> ATTENTION: This package is **WIP**
+> ATTENTION: This package is **WIP** in _alpha_ release
 
 ## Test
 
