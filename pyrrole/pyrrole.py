@@ -23,6 +23,7 @@
 """Core module of pyrrole."""
 
 from .exception import RoleMethodError, RoleAttributeNameError
+from types import new_class
 
 __all__ = ['Role', 'role', 'role_method', 'has_role', 'apply_roles', 'rename_role_methods']
 
@@ -32,11 +33,24 @@ class Role(type):
 
     def __new__(mcs, name, bases, dct):
         # Create a new instance role class
-        new_class = super().__new__(mcs, name, bases, dct)
-        return new_class
+        new_cls = super().__new__(mcs, name, bases, dct)
+        return new_cls
 
     def __call__(cls, class_):
         return cls._install_methods(class_)
+
+    def _make_role_property(cls):
+
+        def get_roles(self):
+            return self.__roles
+
+        def set_roles(self, value):
+            if not isinstance(value, list):
+                raise AttributeError('__roles__ must be a list')
+            self.__roles = value
+
+        cls.__roles = None
+        cls.__roles__ = property(fget=get_roles, fset=set_roles)
 
     def _isrolemethod(cls, method):
         # Check if is role method
@@ -51,7 +65,8 @@ class Role(type):
         if hasattr(class_, '__roles__'):
             class_.__roles__.append(cls.__name__)
         else:
-            setattr(class_, '__roles__', [cls.__name__])
+            cls._make_role_property()
+            class_.__roles__ = [cls.__name__]
         # Inject other attribute or method on role class
         for attr in dir(cls):
             if attr == 'roled_class':
@@ -91,7 +106,11 @@ def has_role(instance, role_name):
 
 def role(cls):
     """Decorator function for create role type"""
-    return Role(cls.__name__, cls.__bases__, dict(cls.__dict__))
+    new_cls = new_class(cls.__name__, cls.__bases__, {'metaclass': Role})
+    for key, value in dict(cls.__dict__).items():
+        if key != '__dict__':
+            setattr(new_cls, key, value)
+    return new_cls
 
 
 def apply_roles(*role_objects):

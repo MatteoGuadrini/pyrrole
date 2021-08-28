@@ -6,7 +6,7 @@ _pyrrole_ is a Role System for Python3 (3.6 and high).
 It's inspired by the roles implementation in the [Moose library of Perl](https://metacpan.org/pod/Moose::Role), 
 and its main purpose is to use instead of Mixin classes and multiple inheritance.
 
-> ATTENTION: This package is **WIP**
+> ATTENTION: This package is **WIP** in _alpha_ release
 
 ## Test
 
@@ -86,27 +86,27 @@ import pyrrole
 @pyrrole.role                                  # use role with decorator
 class FallFromTree:
     
-    def __init__(cls, instance):
-        cls.trees = list()
-        cls.trees.append(instance)
+    def __init__(self, instance):
+        self.trees = list()
+        self.trees.append(instance)
     
-    def fall(cls, tree='tree'):
+    def fall(self, tree='tree'):
         return f"Fall from {tree}"
     
 @pyrrole.role                                   # use role with decorator
 class Deciduous:
     
-    def __init__(cls, instance):
-        cls.trees = list()
-        cls.trees.append(instance)
+    def __init__(self, instance):
+        self.trees = list()
+        self.trees.append(instance)
     
-    def clean_leaf(cls):
+    def clean_leaf(self):
         return f"Clean all leaf"
 
 class Fruit:
     pass
 
-@pyrrole.apply_roles(FallFromTree, Deciduous)
+@pyrrole.apply_roles(FallFromTree, Deciduous)               # apply more role at same time
 @pyrrole.rename_role_methods(clean_leaf='clean_apple_leaf') # renamed role names
 class Apple(Fruit):
     def clean_leaf(self):
@@ -119,8 +119,8 @@ pyrrole.has_role(apple, FallFromTree)   # True
 pyrrole.has_role(apple, Deciduous)      # True
 
 print(apple.__roles__)                  # ['FallFromTree', 'Deciduous']
-print(apple.clean_apple_leaf())         # method renamed from the role
-print(apple.fall('apple tree'))         # method forced inherited from the role
+print(apple.clean_apple_leaf())         # method renamed from the Deciduous role
+print(apple.fall('apple tree'))         # method forced inherited from the FallFromTree role
 ```
 
 ## Open source
